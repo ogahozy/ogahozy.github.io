@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Download Davids WA Commerce App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8fdf9;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: #fff;
+      border-bottom: 2px solid #dcfce7;
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .nav-logo-text { font-size: 15px; font-weight: 700; color: #15803d; line-height: 1.2; }
+
+    /* HERO */
+    .hero {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 48px 24px 32px;
+      text-align: center;
+    }
+
+    .app-icon {
+      width: 96px; height: 96px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 32px rgba(22,163,74,0.25);
+    }
+
+    .app-name {
+      font-size: 26px;
+      font-weight: 800;
+      color: #15803d;
+      margin-bottom: 8px;
+    }
+
+    .app-tagline {
+      font-size: 16px;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* DOWNLOAD BUTTON */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 16px;
+      padding: 18px 32px;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(22,163,74,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+      justify-content: center;
+    }
+    .download-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 10px rgba(22,163,74,0.25);
+    }
+    .download-btn-icon { font-size: 28px; }
+    .download-btn-text { text-align: left; }
+    .download-btn-title { display: block; font-size: 17px; font-weight: 700; }
+    .download-btn-sub { display: block; font-size: 12px; opacity: 0.85; font-weight: 400; margin-top: 2px; }
+
+    .file-info {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 32px;
+    }
+
+    /* INSTALL STEPS */
+    .steps-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid #dcfce7;
+      text-align: left;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .steps-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #15803d;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .step:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 28px; height: 28px;
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text { font-size: 14px; color: #374151; line-height: 1.6; }
+    .step-text strong { color: #15803d; }
+
+    /* UNKNOWN SOURCES NOTE */
+    .note-card {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .note-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 6px; }
+    .note-text { font-size: 13px; color: #78350f; line-height: 1.6; }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .feature {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #dcfce7;
+      text-align: center;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 8px; }
+    .feature-text { font-size: 12px; color: #4b5563; line-height: 1.5; font-weight: 500; }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #9ca3af;
+      border-top: 1px solid #dcfce7;
+    }
+    .footer a { color: #15803d; text-decoration: none; }
+
+    /* HELP */
+    .help-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      border: 1px solid #dcfce7;
+      text-align: center;
+    }
+    .help-text { font-size: 14px; color: #4b5563; margin-bottom: 12px; }
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">🤖</div>
+      <div class="nav-logo-text">Davids WA Commerce<br><span style="font-weight:400;color:#6b7280;font-size:12px">Business Owner App</span></div>
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+
+    <div class="app-icon">🤖</div>
+    <div class="app-name">Davids WA Commerce</div>
+    <div class="app-tagline">
+      Set up your WhatsApp business bot and manage all your customer conversations in one place.
+    </div>
+
+    <!-- DOWNLOAD BUTTON -->
+    <a href="/assets/DavidsWACommerce.apk" class="download-btn" id="downloadBtn">
+      <span class="download-btn-icon">📲</span>
+      <span class="download-btn-text">
+        <span class="download-btn-title">Download for Android</span>
+        <span class="download-btn-sub">Free · Android 8.0 and above</span>
+      </span>
+    </a>
+    <div class="file-info">APK file · Install directly on your Android phone</div>
+
+    <!-- FEATURES -->
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">💬</div>
+        <div class="feature-text">Monitor all customer conversations</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-text">AI handles customers 24/7</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">Nightly market intelligence</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🛒</div>
+        <div class="feature-text">Product catalogue & orders</div>
+      </div>
+    </div>
+
+    <!-- INSTALL STEPS -->
+    <div class="steps-card">
+      <div class="steps-title">📋 How to install</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Tap <strong>Download for Android</strong> above — the APK file will download to your phone.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Open your <strong>Downloads folder</strong> and tap the file <strong>DavidsWACommerce.apk</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">If prompted, tap <strong>Install anyway</strong> or enable <strong>Install from unknown sources</strong> in your settings.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">Open the app, <strong>login with your WhatsApp number</strong>, and complete your business setup in 5 minutes.</div>
+      </div>
+    </div>
+
+    <!-- UNKNOWN SOURCES NOTE -->
+    <div class="note-card">
+      <div class="note-title">⚠️ "Install from unknown sources" prompt</div>
+      <div class="note-text">
+        Android may ask you to allow installation from unknown sources. This is normal for apps not yet on the Play Store.
+        Go to <strong>Settings → Security → Install unknown apps</strong> and allow your browser or file manager.
+        The app is safe — built by Davids Computer and Allied Components Concepts (CAC Reg. 9061845).
+      </div>
+    </div>
+
+    <!-- HELP -->
+    <div class="help-section">
+      <div class="help-text">Having trouble installing? We'll walk you through it.</div>
+      <a href="https://wa.me/2348069389198?text=Hi%20David%2C%20I%20need%20help%20installing%20the%20app" class="wa-btn">
+        💬 Chat with David on WhatsApp
+      </a>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    © 2026 Davids Computer and Allied Components Concepts · CAC Reg. 9061845<br>
+    <a href="/">ogahslab.com</a> · <a href="/privacy.html">Privacy Policy</a>
+  </div>
+
+</body>
+</html>
