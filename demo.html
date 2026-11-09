@@ -1085,14 +1085,10 @@ let demoStep = 0;
 let demoMsgs = [];
 
 function updateWaLink() {
-  const meta = CAT_META[currentCat] || CAT_META.electronics;
-  const bizName = currentBiz || DEMOS[currentCat].title;
-  const msg = encodeURIComponent(
-    `Hi SwiftServe 👋\n\n` +
-    `I'd like to set up a WhatsApp bot for my business.\n\n` +
-    `Business: ${bizName}\n` +
-    `Type: ${meta.label}`
-  );
+  // "Yes, tell me more" is the exact trigger the bot recognises from the cold outreach template.
+  // Using the same text here means prospects who arrive from the demo page get the same
+  // onboarding flow (Option 1 app / Option 2 WhatsApp START) as clicking the template button.
+  const msg = encodeURIComponent("Yes, tell me more");
   const link = `https://wa.me/2347051498314?text=${msg}`;
   const btn = document.getElementById("wa-start-btn");
   if (btn) btn.href = link;
