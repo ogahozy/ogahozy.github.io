@@ -1179,7 +1179,10 @@ window.addEventListener("DOMContentLoaded", () => {
     let biz = params.get("biz");
 
     // Parse path slug format: /demo/BizName--catslug
-    const pathMatch = location.pathname.match(/\/demo\/([^\/]+)$/);
+    // Also check sessionStorage — set by 404.html when GitHub Pages 404'd the /demo/* path
+    let storedSlug = null;
+    try { storedSlug = sessionStorage.getItem('demoSlug'); sessionStorage.removeItem('demoSlug'); } catch(e){}
+    const pathMatch = location.pathname.match(/\/demo\/([^\/]+)$/) || (storedSlug ? [null, storedSlug] : null);
     if (pathMatch) {
       const slug = decodeURIComponent(pathMatch[1]);
       const sep  = slug.lastIndexOf("--");

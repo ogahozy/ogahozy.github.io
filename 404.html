@@ -1,6 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <script>
-  // Redirect /demo/slug to demo.html preserving the path as a param
-  sessionStorage.setItem('redirect', location.pathname + location.search);
-  location.replace('/demo.html');
+  var path = window.location.pathname;
+  var slug = path.match(/\/demo\/([^\/]+)/);
+  if (slug) {
+    try { sessionStorage.setItem('demoSlug', decodeURIComponent(slug[1])); } catch(e){}
+    window.location.replace('/demo.html');
+  } else {
+    window.location.replace('/');
+  }
 </script>
