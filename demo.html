@@ -733,11 +733,11 @@ footer {
 
 <!-- ── Hero ──────────────────────────────────────────────────────────── -->
 <div class="section hero">
-  <div class="hero-eyebrow">
+  <div class="hero-eyebrow" id="hero-eyebrow">
     <span>🇳🇬</span> Built for Nigerian Businesses
   </div>
-  <h1>Your business answers<br><em>every WhatsApp</em><br>automatically</h1>
-  <p class="hero-sub">AI assistant that replies customers 24/7 — while you focus on running your business.</p>
+  <h1 id="hero-h1">Your business answers<br><em>every WhatsApp</em><br>automatically</h1>
+  <p class="hero-sub" id="hero-sub">AI assistant that replies customers 24/7 — while you focus on running your business.</p>
 
   <div class="hero-stats">
     <div class="hero-stat">
@@ -759,8 +759,8 @@ footer {
 <div class="section" id="demo" style="padding-top:0">
   <div class="section-header">
     <span class="section-eyebrow">Live Demo</span>
-    <h2>See your bot in action</h2>
-    <p>Pick your business type and watch the AI handle a real customer conversation.</p>
+    <h2 id="demo-h2">See your bot in action</h2>
+    <p id="demo-sub">Pick your business type and watch the AI handle a real customer conversation.</p>
   </div>
 
   <p class="picker-label">What do you sell?</p>
@@ -812,8 +812,8 @@ footer {
 <!-- ── ROI Calculator ─────────────────────────────────────────────────── -->
 <div class="section" id="roi">
   <div class="roi-card">
-    <h2>How much is slow replies costing you?</h2>
-    <p>Enter your numbers and see what you're losing every month.</p>
+    <h2 id="roi-h2">How much is slow replies costing you?</h2>
+    <p id="roi-p">Enter your numbers and see what you're losing every month.</p>
     <div class="roi-inputs">
       <div class="roi-row">
         <label>WhatsApp messages per day</label>
@@ -977,8 +977,8 @@ footer {
 <!-- ── CTA / Onboard ───────────────────────────────────────────────────── -->
 <div class="section" id="onboard">
   <div class="onboard-card" id="onboard-card">
-    <h2>Get your bot live before Christmas 🎄</h2>
-    <p>Tap the button — we'll set everything up for you on WhatsApp, usually within 24 hours.</p>
+    <h2 id="onboard-h2">Get your bot live before Christmas 🎄</h2>
+    <p id="onboard-p">Tap the button — we'll set everything up for you on WhatsApp, usually within 24 hours.</p>
 
     <a class="submit-btn" id="wa-start-btn" href="#" target="_blank" rel="noreferrer" style="display:block;text-decoration:none;margin-top:8px;">
       💬 Start My Free Setup on WhatsApp →
@@ -1114,11 +1114,16 @@ function startDemo() {
   if (demoTimer) clearTimeout(demoTimer);
   const data = DEMOS[currentCat];
   document.getElementById("chat-icon").textContent = data.icon;
-  document.getElementById("chat-title").textContent = data.title;
+  // Show the actual business name in the chat header when available
+  document.getElementById("chat-title").textContent = currentBiz || data.title;
   const body = document.getElementById("chat-body");
   body.innerHTML = "";
   demoStep = 0;
-  demoMsgs = data.convo;
+  // Clone convo and replace generic biz name with actual biz name
+  demoMsgs = data.convo.map(m => {
+    if (!currentBiz) return m;
+    return { ...m, text: m.text.replace(new RegExp(data.title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g'), currentBiz) };
+  });
   nextMsg();
 }
 
@@ -1161,6 +1166,45 @@ function appendMsg(msg, body) {
   el.style.animationDelay = "0s";
   body.appendChild(el);
   body.scrollTop = body.scrollHeight;
+}
+
+/* ── Personalize all page copy when a biz name is known ─────────────── */
+function personalizePageForBiz(biz, cat) {
+  if (!biz) return;
+  const shortBiz = biz.length > 22 ? biz.split(" ").slice(0,2).join(" ") : biz;
+  const catMeta  = CAT_META[cat] || {};
+  const catLabel = (catMeta.label || "").split(" / ")[0] || "your";
+
+  // Hero
+  const eyebrow = document.getElementById("hero-eyebrow");
+  if (eyebrow) eyebrow.innerHTML = `<span>🎯</span> Personalised demo for ${shortBiz}`;
+
+  const h1 = document.getElementById("hero-h1");
+  if (h1) h1.innerHTML = `See how <em>${shortBiz}</em><br>handles every WhatsApp<br>automatically`;
+
+  const sub = document.getElementById("hero-sub");
+  if (sub) sub.textContent = `Watch a live demo of your AI assistant replying ${catLabel} customers 24/7 — exactly as it would for ${shortBiz}.`;
+
+  // Demo section
+  const demoH2 = document.getElementById("demo-h2");
+  if (demoH2) demoH2.textContent = `${shortBiz}'s bot in action`;
+
+  const demoSub = document.getElementById("demo-sub");
+  if (demoSub) demoSub.textContent = `Watch the AI handle a real ${catLabel} customer conversation for ${shortBiz}.`;
+
+  // ROI section
+  const roiH2 = document.getElementById("roi-h2");
+  if (roiH2) roiH2.innerHTML = `How much is <em style="font-style:normal;color:var(--accent)">${shortBiz}</em> losing to slow replies?`;
+
+  const roiP = document.getElementById("roi-p");
+  if (roiP) roiP.textContent = `Adjust the numbers for ${shortBiz} and see your real revenue loss each month.`;
+
+  // CTA
+  const onboardH2 = document.getElementById("onboard-h2");
+  if (onboardH2) onboardH2.innerHTML = `Get ${shortBiz}'s bot live 🚀`;
+
+  const onboardP = document.getElementById("onboard-p");
+  if (onboardP) onboardP.textContent = `Tap the button — we'll set up ${shortBiz}'s WhatsApp AI, usually within 24 hours.`;
 }
 
 // Auto-start on load
@@ -1209,6 +1253,8 @@ window.addEventListener("DOMContentLoaded", () => {
     } else {
       startDemo(); calcRoi(); updateWaLink();
     }
+    // Personalize page copy after category + biz are resolved
+    if (currentBiz) personalizePageForBiz(currentBiz, currentCat);
   } catch(e) {
     startDemo(); calcRoi(); updateWaLink();
   }
