@@ -1107,6 +1107,8 @@ function selectCat(btn) {
     calcRoi();
   }
   updateWaLink();
+  // Re-apply biz personalization for the new category (ROI label etc.)
+  if (currentBiz) personalizePageForBiz(currentBiz, currentCat);
   startDemo();
 }
 
@@ -1248,13 +1250,24 @@ window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("roi-miss").value = parseInt(miss);
     }
     if (cat && DEMOS[cat]) {
+      currentCat = cat;
+      // Activate the right cat button
+      document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
       const btn = document.querySelector(`.cat-btn[data-cat="${cat}"]`);
-      if (btn) { selectCat(btn); } else { startDemo(); calcRoi(); updateWaLink(); }
-    } else {
-      startDemo(); calcRoi(); updateWaLink();
+      if (btn) btn.classList.add("active");
+      // Load ROI defaults for this category
+      const meta = CAT_META[cat];
+      if (meta) {
+        document.getElementById("roi-msgs").value  = meta.msgs;
+        document.getElementById("roi-order").value = meta.order;
+        document.getElementById("roi-miss").value  = meta.miss;
+      }
     }
-    // Personalize page copy after category + biz are resolved
+    // Personalize BEFORE startDemo so biz name is in place when chat title renders
     if (currentBiz) personalizePageForBiz(currentBiz, currentCat);
+    startDemo();
+    calcRoi();
+    updateWaLink();
   } catch(e) {
     startDemo(); calcRoi(); updateWaLink();
   }

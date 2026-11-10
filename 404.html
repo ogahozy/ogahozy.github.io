@@ -4,7 +4,8 @@
   var slug = path.match(/\/demo\/([^\/]+)/);
   if (slug) {
     try { sessionStorage.setItem('demoSlug', decodeURIComponent(slug[1])); } catch(e){}
-    window.location.replace('/demo.html');
+    // Preserve any query params (e.g. ?msgs=55) when redirecting
+    window.location.replace('/demo.html' + window.location.search);
   } else {
     window.location.replace('/');
   }
