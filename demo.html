@@ -251,6 +251,8 @@ body::before {
   gap: 8px;
   margin-bottom: 28px;
 }
+/* Hidden when personalized link supplies the category */
+.picker-hidden { display: none !important; }
 .cat-btn {
   border: 1.5px solid var(--border);
   background: var(--surface);
@@ -763,8 +765,8 @@ footer {
     <p id="demo-sub">Pick your business type and watch the AI handle a real customer conversation.</p>
   </div>
 
-  <p class="picker-label">What do you sell?</p>
-  <div class="category-grid">
+  <p class="picker-label" id="picker-label">What do you sell?</p>
+  <div class="category-grid" id="category-grid">
     <button class="cat-btn active" data-cat="electronics" onclick="selectCat(this)">
       <span class="cat-icon">📱</span>
       <span class="cat-name">Electronics</span>
@@ -1192,14 +1194,20 @@ function personalizePageForBiz(biz, cat) {
   if (demoH2) demoH2.textContent = `${shortBiz}'s bot in action`;
 
   const demoSub = document.getElementById("demo-sub");
-  if (demoSub) demoSub.textContent = `Watch the AI handle a real ${catLabel} customer conversation for ${shortBiz}.`;
+  if (demoSub) demoSub.textContent = `Watch how ${shortBiz}'s AI assistant handles real ${catLabel} customer questions — 24/7, automatically.`;
 
   // ROI section
   const roiH2 = document.getElementById("roi-h2");
   if (roiH2) roiH2.innerHTML = `How much is <em style="font-style:normal;color:var(--accent)">${shortBiz}</em> losing to slow replies?`;
 
   const roiP = document.getElementById("roi-p");
-  if (roiP) roiP.textContent = `Adjust the numbers for ${shortBiz} and see your real revenue loss each month.`;
+  if (roiP) roiP.textContent = `These are typical numbers for a ${catLabel} business. Adjust them to match ${shortBiz} and see your exact revenue loss.`;
+
+  // Hide category picker — category is already known from the link
+  const pickerLabel = document.getElementById("picker-label");
+  const categoryGrid = document.getElementById("category-grid");
+  if (pickerLabel) pickerLabel.classList.add("picker-hidden");
+  if (categoryGrid) categoryGrid.classList.add("picker-hidden");
 
   // CTA
   const onboardH2 = document.getElementById("onboard-h2");
@@ -1220,19 +1228,25 @@ window.addEventListener("DOMContentLoaded", () => {
     let cat = params.get("cat");
     let biz = params.get("biz");
 
-    // Parse path slug format: /demo/BizName--catslug
+    // Parse path slug format: /demo/BizName--catslug--bizId
     // Also check sessionStorage — set by 404.html when GitHub Pages 404'd the /demo/* path
     let storedSlug = null;
     try { storedSlug = sessionStorage.getItem('demoSlug'); sessionStorage.removeItem('demoSlug'); } catch(e){}
     const pathMatch = location.pathname.match(/\/demo\/([^\/]+)$/) || (storedSlug ? [null, storedSlug] : null);
     if (pathMatch) {
       const slug = decodeURIComponent(pathMatch[1]);
-      const sep  = slug.lastIndexOf("--");
-      if (sep !== -1) {
-        const bizPart = slug.slice(0, sep).replace(/-/g, " ").trim();
-        const catPart = slug.slice(sep + 2).trim();
+      // Slug format: BizName--catslug  OR  BizName--catslug--123
+      const parts = slug.split("--");
+      if (parts.length >= 2) {
+        // Last part is numeric bizId if present
+        const lastPart = parts[parts.length - 1];
+        const hasId = /^\d+$/.test(lastPart);
+        const bizId = hasId ? parseInt(lastPart) : null;
+        const catPart = hasId ? parts[parts.length - 2] : lastPart;
+        const bizPart = parts.slice(0, hasId ? parts.length - 2 : parts.length - 1).join("--").replace(/-/g, " ").trim();
         if (!biz && bizPart) biz = bizPart;
         if (!cat && catPart) cat = catPart;
+        if (bizId) window._demoBizId = bizId;
       }
     }
 
@@ -1268,10 +1282,44 @@ window.addEventListener("DOMContentLoaded", () => {
     startDemo();
     calcRoi();
     updateWaLink();
+    // Fetch real ROI figures from LeadIntel API if we have a business ID
+    if (window._demoBizId) fetchRealRoi(window._demoBizId);
   } catch(e) {
     startDemo(); calcRoi(); updateWaLink();
   }
 });
+
+/* ── Fetch real ROI from LeadIntel API ───────────────────────────────── */
+function fetchRealRoi(bizId) {
+  fetch(`https://api.ogahslab.com/roi/${bizId}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || !data.results || !data.assumptions) return;
+      const a = data.assumptions;
+      const r = data.results;
+
+      // Map API fields → demo ROI inputs
+      // daily_messages → msgs input
+      // avg_transaction_naira → order input
+      // response_rate_manual → miss% (1 - response_rate = miss rate)
+      const missPercent = Math.round((1 - a.response_rate_manual) * 100);
+      document.getElementById("roi-msgs").value  = a.daily_messages;
+      document.getElementById("roi-order").value = Math.round(a.avg_transaction_naira);
+      document.getElementById("roi-miss").value  = missPercent;
+
+      // Update results directly with API's precise figures
+      document.getElementById("roi-monthly").textContent   = fmt(r.missed_revenue_currently);
+      document.getElementById("roi-annual").textContent    = fmt(r.missed_revenue_currently * 12);
+      document.getElementById("roi-recovered").textContent = fmt(r.additional_monthly_revenue);
+      document.getElementById("roi-payback").textContent   = r.payback_days < 999 ? r.payback_days + "d" : "—";
+
+      // Update ROI subtitle to reflect real data source
+      const bizName = data.business_name || currentBiz;
+      const roiP = document.getElementById("roi-p");
+      if (roiP) roiP.textContent = `Calculated from ${bizName}'s category and market data. Adjust if needed.`;
+    })
+    .catch(() => {/* silently fall back to category defaults already shown */});
+}
 
 /* ── ROI Calculator ──────────────────────────────────────────────────── */
 function fmt(n) {
